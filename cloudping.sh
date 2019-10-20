@@ -1,9 +1,10 @@
 #!sh
 
-logfile=$(hostname).log
+httplogfile=$(hostname).http
+pinglogfile=$(hostname).ping
 
-targets=<<EOF
-dynamodb.us-east-1.amazonaws.com
+
+targets="dynamodb.us-east-1.amazonaws.com
 dynamodb.us-east-2.amazonaws.com
 dynamodb.us-west-1.amazonaws.com
 dynamodb.us-west-2.amazonaws.com
@@ -25,9 +26,11 @@ dynamodb.sa-east-1.amazonaws.com
 dynamodb.cn-north-1.amazonaws.com.cn
 dynamodb.cn-northwest-1.amazonaws.com.cn
 dynamodb.us-gov-east-1.amazonaws.com
-dynamodb.us-gov-west-1.amazonaws.com
-EOF
+dynamodb.us-gov-west-1.amazonaws.com"
 
-while true
-do
-    httping -S ${logfile}
+for i in ${targets}; do
+    date -R >> ${httplogfile}
+    httping -c 10 -S https://${i}/ >> ${httplogfile}
+    date -R >> ${pinglogfile}
+    ping -c 10 ${i} >> ${pinglogfile}
+done
